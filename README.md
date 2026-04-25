@@ -1,153 +1,201 @@
 # Jinsuk Dotfiles
 
-새 맥에서도 바로 다시 올릴 수 있게, `stow` 기준으로 최소 구성만 남긴 개인용 dotfiles입니다.
+Personal macOS dotfiles built around Ghostty, tmux, Starship, mise, and LazyVim. The repo is designed to be enough by itself to reproduce the current terminal setup on a new Mac.
 
-## 선택한 스택
+## What This Sets Up
 
-- Terminal: Ghostty
-- Shell: zsh 또는 nushell + starship
-- Runtime manager: mise
-- Editor: LazyVim
-- Terminal tools: tmux, zoxide, atuin, eza, bat, fd, ripgrep, jq, yq, lazygit
-- Optional TUI: Television (`tv`)
+- `Ghostty` as the primary terminal.
+- `tmux` with a top status bar, pill-style theme, TPM plugins, SessionX, Floax, tmux-fzf, URL picker, resurrect, and continuum restore disabled by default.
+- `zsh` by default, with optional `nushell` profile support.
+- `Starship` prompt with directory/git on the left, mise runtime tools and command status on the first-line right side, and contextual right prompt modules on the input line.
+- `mise` as the single runtime manager for Python, Node, Java, and other project-local tool versions.
+- `LazyVim` replacing SpaceVim, with transparent theme support and tmux navigator integration.
+- Optional `television` (`tv`) fuzzy picker UI with file, git, Docker, Kubernetes, GitHub, history, tmux, and utility channels.
+- CLI utilities: `atuin`, `bat`, `direnv`, `eza`, `fd`, `fzf`, `gh`, `git`, `jq`, `kubectl`, `lazygit`, `rg`, `yq`, and `zoxide`.
 
-## 셸 구조
+This setup intentionally does not use Oh My Zsh, Powerlevel10k, pyenv, fnm, autojump, or SpaceVim.
 
-`zsh`를 고르면:
-: `~/.zshenv`, `~/.config/zsh/.zprofile`, `~/.config/zsh/.zshrc` 구조를 씁니다.
+## Requirements
 
-`nushell`을 고르면:
-: `~/.config/nushell/env.nu`, `~/.config/nushell/config.nu` 구조를 씁니다.
+- macOS.
+- Homebrew installed before running setup.
+- This repo cloned to `~/dotfiles`.
+- Existing dotfiles moved out of the way if they conflict with GNU Stow links.
 
-`setup.sh`가 처음에 셸을 먼저 고르게 하고, 이후 설치와 링크도 그 셸에 맞춰 나눕니다. 기본값은 `zsh`입니다.
-
-## 이번에 뺀 것
-
-- `autojump`: `zoxide`가 더 낫고 관리도 단순합니다.
-- `pyenv`, `fnm`: `mise` 하나로 합칩니다.
-- `wezterm`, `kitty`, `alacritty`: 메인 터미널을 Ghostty로 고정합니다.
-- `btop`, `fastfetch`: 예쁘긴 하지만 필수는 아닙니다.
-- `k9s`: Kubernetes를 매일 깊게 보지 않으면 일단 보류해도 됩니다.
-
-## 설치
+Clone location matters because a few defaults point at `~/dotfiles`, especially tmux SessionX custom paths.
 
 ```bash
+git clone <your-repo-url> ~/dotfiles
 cd ~/dotfiles
+```
+
+## Install
+
+Interactive install, defaulting to `zsh` and asking whether to install `tv`:
+
+```bash
 ./setup.sh
 ```
 
-셸까지 바로 지정하고 싶으면:
-
-```bash
-./setup.sh --shell zsh
-./setup.sh --shell nu
-```
-
-`tv`를 바로 포함하고 싶으면:
+Non-interactive examples:
 
 ```bash
 ./setup.sh --shell zsh --with-tv
-./setup.sh --shell nu --with-tv
-```
-
-`tv`를 빼고 싶으면:
-
-```bash
 ./setup.sh --shell zsh --without-tv
+./setup.sh --shell nu --with-tv
 ./setup.sh --shell nu --without-tv
 ```
 
-`setup.sh`는 아래를 수행합니다.
+`setup.sh` performs these steps:
 
-1. `zsh`와 `nu` 중 셸 프로필을 먼저 고릅니다. 기본값은 `zsh`입니다.
-2. `brew bundle`로 공통 패키지와 셸별 패키지를 설치합니다.
-3. GUI 앱은 기본 Homebrew 위치인 `/Applications`에 설치합니다.
-4. `tv`는 설치 시 사용자 입력을 받아 포함/제외를 나눕니다.
-5. `stow`로 선택된 셸 설정만 홈 디렉터리에 심볼릭 링크를 겁니다.
+- Generates theme-derived configs from `theme/theme.toml`.
+- Runs `brew bundle --file Brewfile`.
+- Installs shell-specific packages from `Brewfile.zsh` or `Brewfile.nu`.
+- Optionally installs `television` from `Brewfile.tv`.
+- Uses `stow` to link only the selected shell profile plus common app configs into `$HOME`.
+- Installs TPM under `~/.local/share/tmux/plugins/tpm` if missing.
+- Attempts to install tmux plugins after linking the tmux config.
 
-## Theme
+## Repo Layout
 
-공통 배경/색/알약 스타일은 `theme/theme.toml` 하나에서 관리합니다. 앱별 설정에 색상값을 직접 복붙하지 않고, `sets.<name>`에 있는 `background`, `foreground`, `primary`, `secondary`, `accent`, `surface` 같은 token 이름을 참조합니다.
+- `Brewfile`: common Homebrew formulae and casks.
+- `Brewfile.zsh`: zsh and zsh plugins.
+- `Brewfile.nu`: nushell.
+- `Brewfile.tv`: optional Television package.
+- `setup.sh`: main bootstrap entrypoint.
+- `theme/theme.toml`: shared theme token source.
+- `scripts/apply_theme.py`: generator for Ghostty, tmux, Neovim, and Television theme files.
+- `ghostty/`: `~/.config/ghostty/config`.
+- `zsh/`: `~/.zshenv`, `~/.config/zsh/.zprofile`, and `~/.config/zsh/.zshrc`.
+- `nushell/`: `~/.config/nushell/env.nu` and `~/.config/nushell/config.nu`.
+- `starship/`: prompt config and the custom mise runtime module.
+- `tmux/`: tmux config, generated theme, reset config, and small helper scripts.
+- `nvim/`: LazyVim-based Neovim config.
+- `television/`: optional Television config and channel library.
+- `television-nu/`: extra Television channel for Nushell history.
+- `examples/`: small project-local examples, including mise runtime config.
+- `KEYMAPS.md`: all configured shortcuts and important tool combinations.
 
-- `ghostty`: 배경색, opacity, blur, 폰트
-- `tmux`: session/window/directory/time pill을 token 색으로 생성
-- `tv`: 배경색
-- `nvim`: colorscheme와 투명 배경 여부
-- `sets.*`: 실제 컬러 세트
+## Shell Profiles
 
-수정 후에는:
+The default profile is `zsh`.
+
+`zsh` layout:
+
+- `~/.zshenv`: XDG paths and `ZDOTDIR`.
+- `~/.config/zsh/.zprofile`: Homebrew path, editor, pager, local bin.
+- `~/.config/zsh/.zshrc`: completion, fzf, zsh plugins, aliases, mise, zoxide, atuin, direnv, optional tv, and Starship.
+
+`nushell` layout:
+
+- `~/.config/nushell/env.nu`: XDG paths, Homebrew path, editor, generated init caches.
+- `~/.config/nushell/config.nu`: aliases, direnv hook, zoxide, atuin, Starship, mise, and optional tv keybindings.
+
+Ghostty uses `shell-integration = detect` so the terminal is not hard-coded to zsh when the Nushell profile is selected.
+
+## Theme System
+
+Theme values are centralized in `theme/theme.toml`. App configs are generated from token sets instead of manually duplicating colors.
+
+Generated files:
+
+- `ghostty/.config/ghostty/config`
+- `tmux/.config/tmux/theme.conf`
+- `nvim/.config/nvim/lua/config/theme.lua`
+- `television/.config/television/config.toml` generated block
+
+Commands:
 
 ```bash
 cd ~/dotfiles
-python3 scripts/apply_theme.py
-tmux source-file ~/.config/tmux/tmux.conf
-```
-
-컬러 세트는 이렇게 씁니다.
-
-```bash
 python3 scripts/apply_theme.py --list
+python3 scripts/apply_theme.py --set mocha
 python3 scripts/apply_theme.py --set tokyonight
 python3 scripts/apply_theme.py --set storm
 python3 scripts/apply_theme.py --set moon
-python3 scripts/apply_theme.py --set mocha
 python3 scripts/apply_theme.py --reset
 ```
 
-- `--set NAME`: `active_set`만 바꾸고 Ghostty/tmux/tv/nvim 설정을 다시 생성합니다.
-- `--reset`: `default_set`으로 복구합니다.
-- 새 테마를 만들 때는 `theme/theme.toml`에 `[sets.my-theme]`만 추가하면 됩니다.
-- tmux의 active window pill 오른쪽 값은 `현재 pane 번호/현재 window의 전체 pane 수`입니다.
+After changing tmux theme output:
 
-Ghostty는 이 스크립트가 백그라운드에서 감시하지 않습니다. 테마 생성 스크립트는 실행 후 바로 종료되고, Ghostty는 다음 실행 시 설정을 읽거나 `cmd+shift+,`로 수동 reload 했을 때만 다시 읽습니다.
+```bash
+tmux source-file ~/.config/tmux/tmux.conf
+```
 
-## 런타임 버전 관리
+Ghostty does not continuously watch this repo. Restart Ghostty or reload its config after generated Ghostty changes.
 
-전역 기본값을 강하게 박지 않고, 프로젝트마다 `mise.toml` 또는 `.tool-versions`로 버전을 고정하는 쪽을 추천합니다.
+## Runtime Versions With mise
 
-예시:
+Use project-local `mise.toml` files instead of global pyenv/fnm state.
+
+Example:
 
 ```toml
 [tools]
-node = "22"
 python = "3.12"
+node = "22"
+java = "temurin-21"
 ```
 
-## 포함된 패키지
+Apply in a project:
 
-- `zsh/`: `~/.zshenv`, `~/.config/zsh/.zprofile`, `~/.config/zsh/.zshrc`
-- `nushell/`: `~/.config/nushell/env.nu`, `~/.config/nushell/config.nu`
-- `ghostty/`: `~/.config/ghostty/config`
-- `starship/`: `~/.config/starship/starship.toml`
-- `tmux/`: `~/.config/tmux/tmux.conf`
-- `nvim/`: `~/.config/nvim/*`
-- `television/`: 선택 시 `~/.config/television/*`
-- `television-nu/`: `nu` 선택 시에만 `nu-history` 채널 추가
+```bash
+cp ~/dotfiles/examples/mise/python-node-java.toml ./mise.toml
+mise trust
+mise install
+mise current
+```
 
-## Tmux
-
-tmux는 원본 레포 방향을 따라 TPM + Catppuccin + SessionX + Floax 기준으로 구성했습니다.
-
-- `prefix`: `Ctrl-A`
-- `prefix + I`: TPM 플러그인 설치/갱신
-- `prefix + o`: SessionX 세션 picker
-- `prefix + p`: Floax floating pane
-
-`setup.sh`는 TPM이 없으면 같이 설치하고, 가능한 경우 플러그인도 바로 받아옵니다.
-플러그인은 repo 안이 아니라 `~/.local/share/tmux/plugins`에 설치되도록 분리했습니다.
-
-자세한 키맵과 추천 window 구조는 [KEYMAPS.md](KEYMAPS.md)를 봅니다.
+The Starship runtime segment only displays tools that are both active in the current directory and actually installed. Missing tools from `mise.toml` are intentionally hidden until installed.
 
 ## Television
 
-원본 레포의 `television/` 폴더는 채널 라이브러리입니다. `config.toml`은 UI/키바인딩이고, `cable/*.toml`은 파일, Git, Docker, Kubernetes, GitHub, history 같은 개별 picker 채널입니다.
+`tv` is optional because it adds a large picker/channel surface. Install it with `--with-tv`.
 
-`tv`는 선택형입니다. 넣으면 `Ctrl-T`로 스마트 자동완성 picker를 열 수 있습니다.
+When installed:
 
-기본 배치는 이렇게 맞췄습니다.
+- `Ctrl+t` opens smart autocomplete through Television.
+- `Ctrl+g` opens Television-backed command history.
+- `Ctrl+r` remains Atuin history in zsh.
+- `tv` by itself opens the default `files` channel.
 
-- `Ctrl-T`: `tv` 스마트 자동완성
-- `Ctrl-R`: `atuin` 히스토리
-- `Ctrl-G`: `tv` 히스토리
+The preview panel is enabled in `television/.config/television/config.toml`. The theme override uses a transparent background so it visually inherits Ghostty/tmux instead of double-darkening the UI.
 
-`zsh` 선택 시에는 `nu` 전용 채널을 설치하지 않고, `nu` 선택 시에만 `nu-history` 채널을 같이 링크합니다.
+## Updating
+
+Install newly added packages:
+
+```bash
+brew bundle --file Brewfile
+brew bundle --file Brewfile.zsh
+brew bundle --file Brewfile.tv
+```
+
+Re-link dotfiles:
+
+```bash
+stow -t "$HOME" ghostty starship tmux nvim zsh
+```
+
+Use `nushell` instead of `zsh`:
+
+```bash
+stow -D -t "$HOME" zsh
+stow -t "$HOME" nushell
+```
+
+## Validation Commands
+
+These are the checks used to keep the repo sane:
+
+```bash
+bash -n setup.sh
+zsh -n zsh/.zshenv zsh/.config/zsh/.zprofile zsh/.config/zsh/.zshrc
+sh -n starship/.config/starship/scripts/mise-tools.sh tmux/.config/tmux/apply-theme.sh tmux/.config/tmux/scripts/current-path.sh
+python3 -m py_compile scripts/apply_theme.py
+python3 scripts/apply_theme.py
+STARSHIP_CONFIG="$PWD/starship/.config/starship/starship.toml" starship prompt --status 0 --cmd-duration 1200 --terminal-width 120
+tmux -f tmux/.config/tmux/tmux.conf start-server
+```
+
+If a generated file changes after `python3 scripts/apply_theme.py`, commit both `theme/theme.toml` and the generated output so a fresh clone matches the current live setup.

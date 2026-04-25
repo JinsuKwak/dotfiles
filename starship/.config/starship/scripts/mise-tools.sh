@@ -2,7 +2,7 @@
 
 command -v mise >/dev/null 2>&1 || exit 0
 
-mise current 2>/dev/null | awk '
+mise ls --current 2>/dev/null | awk '
 function icon(tool) {
   if (tool == "python") return " "
   if (tool == "node" || tool == "nodejs") return " "
@@ -29,11 +29,18 @@ function icon(tool) {
   return ""
 }
 
-function version_text(first,    text, i) {
+function version_text(first,    text) {
   text = first
-  for (i = 3; i <= NF; i++) text = text "/" $i
   if (text !~ /^v/ && text ~ /^[0-9]/) text = "v" text
   return text
+}
+
+NR == 1 && $1 == "Tool" {
+  next
+}
+
+$0 ~ /\(missing\)/ {
+  next
 }
 
 NF >= 2 {

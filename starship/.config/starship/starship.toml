@@ -29,7 +29,7 @@ symbol = " "
 
 [custom.mise_tools]
 command = "sh ~/.config/starship/scripts/mise-tools.sh"
-when = "command -v mise >/dev/null 2>&1 && mise current 2>/dev/null | grep -q ."
+when = "command -v mise >/dev/null 2>&1 && sh ~/.config/starship/scripts/mise-tools.sh | grep -q ."
 shell = ["sh"]
 format = "[$output](bold green) "
 description = "Show only tools currently activated by mise"
