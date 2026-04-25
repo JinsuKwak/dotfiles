@@ -1,4 +1,4 @@
-# Jinsuk Dotfiles
+# Dotfiles
 
 Personal macOS dotfiles built around Ghostty, tmux, Starship, mise, and LazyVim. The repo is designed to be enough by itself to reproduce the current terminal setup on a new Mac.
 
@@ -12,8 +12,6 @@ Personal macOS dotfiles built around Ghostty, tmux, Starship, mise, and LazyVim.
 - `LazyVim` replacing SpaceVim, with transparent theme support and tmux navigator integration.
 - Optional `television` (`tv`) fuzzy picker UI with file, git, Docker, Kubernetes, GitHub, history, tmux, and utility channels.
 - CLI utilities: `atuin`, `bat`, `direnv`, `eza`, `fd`, `fzf`, `gh`, `git`, `jq`, `kubectl`, `lazygit`, `rg`, `yazi`, `yq`, and `zoxide`.
-
-This setup intentionally does not use Oh My Zsh, Powerlevel10k, pyenv, fnm, autojump, or SpaceVim.
 
 ## Requirements
 
