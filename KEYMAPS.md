@@ -124,6 +124,7 @@ Runtime tools are rendered by `starship/.config/starship/scripts/mise-tools.sh`.
 | Send literal prefix | `Ctrl+a` then `Ctrl+a` |
 | Horizontal split | `Ctrl+a` then `\|`, `\`, or `v` |
 | Vertical split | `Ctrl+a` then `-` |
+| Temporary Yazi file manager pane | `Ctrl+a` then `Tab` |
 | Move pane left/down/up/right | `Ctrl+a` then `h/j/k/l` |
 | Resize pane left/down/up/right | `Ctrl+a` then `Shift+h/j/k/l` |
 | New window | `Ctrl+a` then `c` |

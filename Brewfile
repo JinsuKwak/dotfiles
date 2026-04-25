@@ -17,6 +17,7 @@ brew "starship"
 brew "stow"
 brew "tmux"
 brew "yq"
+brew "yazi"
 brew "zoxide"
 
 cask "font-jetbrains-mono-nerd-font"
