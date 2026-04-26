@@ -32,6 +32,14 @@ def _tmux_command_spinner_enabled [] {
   not ($value in ["0" "false" "off" "no"])
 }
 
+def _tmux_command_spinner_set [value: string] {
+  if (($env.TMUX_PANE? | default "") != "") {
+    try { tmux set-option -pqt $env.TMUX_PANE @pane_command_spinner $value } catch {}
+  } else {
+    try { tmux set-option -pq @pane_command_spinner $value } catch {}
+  }
+}
+
 def _tmux_command_spinner_skip [raw_line: string] {
   let command_line = ($raw_line | str trim)
 
@@ -80,7 +88,7 @@ def _tmux_command_spinner_stop [] {
   }
 
   if (($env.TMUX? | default "") != "") and (which tmux | is-not-empty) {
-    try { tmux set-option -pq @pane_command_spinner "" } catch {}
+    _tmux_command_spinner_set ""
   }
 }
 
@@ -111,7 +119,7 @@ def _tmux_command_spinner_start [] {
 
     loop {
       for frame in $frames {
-        try { tmux set-option -pq @pane_command_spinner $frame } catch {}
+        _tmux_command_spinner_set $frame
         sleep 140ms
       }
     }

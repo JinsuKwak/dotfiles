@@ -212,12 +212,9 @@ def build_tmux_theme(theme: dict, tokens: dict) -> str:
     )
     spinner_fg = resolve(tmux["command_spinner_fg"], tokens)
     spinner = (
-        f"#(sh ~/.config/tmux/scripts/pane-spinner.sh "
-        f"'#{{pane_id}}' "
-        f"'{gap}' "
-        f"'{spinner_fg}' "
-        f"'{text_fg}' "
-        f"'{tmux['status_right_padding']}')"
+        f"#{{?#{{@pane_command_spinner}},"
+        f"{gap}#[bg=default]#[fg={spinner_fg}]#{{@pane_command_spinner}}#[fg={text_fg}]#[bg=default]{tmux['status_right_padding']},"
+        f"{tmux['status_right_padding']}}}"
     )
     window = tmux_window_pill(
         number_bg=resolve(tmux["window_icon_bg"], tokens),

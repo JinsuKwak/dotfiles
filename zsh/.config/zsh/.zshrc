@@ -145,6 +145,17 @@ _tmux_command_spinner_enabled() {
   esac
 }
 
+_tmux_command_spinner_set() {
+  emulate -L zsh
+  local value="$1"
+
+  if [[ -n "${TMUX_PANE:-}" ]]; then
+    tmux set-option -pqt "$TMUX_PANE" @pane_command_spinner "$value" >/dev/null 2>&1
+  else
+    tmux set-option -pq @pane_command_spinner "$value" >/dev/null 2>&1
+  fi
+}
+
 _tmux_command_spinner_skip() {
   emulate -L zsh
   local command_line first_word pattern excludes_file
@@ -188,7 +199,7 @@ _tmux_command_spinner_stop() {
     unset _TMUX_COMMAND_SPINNER_PID
   fi
 
-  [[ -n "${TMUX:-}" ]] && command -v tmux >/dev/null 2>&1 && tmux set-option -pq @pane_command_spinner ""
+  [[ -n "${TMUX:-}" ]] && command -v tmux >/dev/null 2>&1 && _tmux_command_spinner_set ""
 }
 
 _tmux_command_spinner_start() {
@@ -208,7 +219,7 @@ _tmux_command_spinner_start() {
     sleep 0.5
     while true; do
       for frame in "${frames[@]}"; do
-        tmux set-option -pq @pane_command_spinner "$frame" >/dev/null 2>&1
+        _tmux_command_spinner_set "$frame"
         sleep 0.14
       done
     done
