@@ -8,7 +8,7 @@ Personal macOS dotfiles built around Ghostty, tmux, Starship, mise, and LazyVim.
 - `tmux` with a top status bar, pill-style theme, TPM plugins, SessionX, Floax, tmux-fzf, URL picker, resurrect, and continuum restore disabled by default.
 - `zsh` by default, with optional `nushell` profile support.
 - `Starship` prompt with directory/git on the left, mise runtime tools and command status on the first-line right side, and contextual right prompt modules on the input line.
-- `tmux` running-command spinner in the status bar for zsh commands that last longer than 500ms.
+- `tmux` running-command spinner in the status bar for zsh or Nushell commands that last longer than 500ms.
 - `mise` as the single runtime manager for Python, Node, Java, and other project-local tool versions.
 - `LazyVim` replacing SpaceVim, with transparent theme support and tmux navigator integration.
 - Optional `television` (`tv`) fuzzy picker UI with file, git, Docker, Kubernetes, GitHub, history, tmux, and utility channels.
@@ -89,7 +89,8 @@ The default profile is `zsh`.
 `nushell` layout:
 
 - `~/.config/nushell/env.nu`: XDG paths, Homebrew path, editor, generated init caches.
-- `~/.config/nushell/config.nu`: aliases, direnv hook, zoxide, atuin, Starship, mise, and optional tv keybindings.
+- `~/.config/nushell/config.nu`: aliases, direnv hook, zoxide, atuin, Starship, mise, tmux command spinner hooks, and optional tv keybindings.
+- `~/.config/nushell/command-spinner-excludes`: editable patterns for commands that should not show the tmux running-command spinner.
 
 Ghostty uses `shell-integration = detect` so the terminal is not hard-coded to zsh when the Nushell profile is selected.
 
@@ -191,7 +192,7 @@ These are the checks used to keep the repo sane:
 ```bash
 bash -n setup.sh
 zsh -n zsh/.zshenv zsh/.config/zsh/.zprofile zsh/.config/zsh/.zshrc
-sh -n starship/.config/starship/scripts/mise-tools.sh tmux/.config/tmux/apply-theme.sh tmux/.config/tmux/scripts/current-path.sh
+sh -n starship/.config/starship/scripts/mise-tools.sh tmux/.config/tmux/apply-theme.sh tmux/.config/tmux/scripts/current-path.sh tmux/.config/tmux/scripts/refresh-pane-spinner.sh
 python3 -m py_compile scripts/apply_theme.py
 python3 scripts/apply_theme.py
 STARSHIP_CONFIG="$PWD/starship/.config/starship/starship.toml" starship prompt --status 0 --cmd-duration 1200 --terminal-width 120

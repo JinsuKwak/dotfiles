@@ -1,3 +1,87 @@
+def _tmux_command_spinner_skip [raw_line: string] {
+  let command_line = ($raw_line | str trim)
+
+  if ($command_line | is-empty) {
+    return true
+  }
+
+  let first_word = ($command_line | split row --regex '\s+' | first)
+
+  if ($first_word in [fg bg jobs cd exit clear reset]) {
+    return true
+  }
+
+  let config_home = ($env.XDG_CONFIG_HOME? | default ($env.HOME | path join ".config"))
+  let excludes_file = ($config_home | path join "nushell" "command-spinner-excludes")
+
+  if not ($excludes_file | path exists) {
+    return false
+  }
+
+  for raw_pattern in (open --raw $excludes_file | lines) {
+    let pattern = (($raw_pattern | split row "#" | first) | str trim)
+
+    if ($pattern | is-empty) {
+      continue
+    }
+
+    if ($pattern | str ends-with "*") {
+      let prefix = ($pattern | str replace "*" "")
+
+      if (($command_line | str starts-with $prefix) or ($first_word | str starts-with $prefix)) {
+        return true
+      }
+    } else if (($first_word == $pattern) or ($command_line == $pattern)) {
+      return true
+    }
+  }
+
+  false
+}
+
+def _tmux_command_spinner_stop [] {
+  if (($env._TMUX_COMMAND_SPINNER_JOB? | default "") != "") {
+    try { job kill ($env._TMUX_COMMAND_SPINNER_JOB | into int) } catch {}
+    $env._TMUX_COMMAND_SPINNER_JOB = ""
+  }
+
+  if (($env.TMUX? | default "") != "") and (which tmux | is-not-empty) {
+    try { tmux set-option -pq @pane_command_spinner "" } catch {}
+  }
+}
+
+def _tmux_command_spinner_start [] {
+  if (($env.TMUX? | default "") == "") {
+    return
+  }
+
+  if (which tmux | is-empty) {
+    return
+  }
+
+  _tmux_command_spinner_stop
+
+  let command_line = (commandline | str trim)
+
+  if (_tmux_command_spinner_skip $command_line) {
+    return
+  }
+
+  let job_id = (job spawn {
+    sleep 500ms
+    let frames = ["⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏"]
+
+    loop {
+      for frame in $frames {
+        try { tmux set-option -pq @pane_command_spinner $frame } catch {}
+        sleep 140ms
+      }
+    }
+  })
+
+  $env._TMUX_COMMAND_SPINNER_JOB = ($job_id | into string)
+}
+
 $env.config = (
   $env.config?
   | default {}
@@ -21,18 +105,21 @@ $env.config = (
         }
       }
       hooks: {
-        pre_prompt: [{||
-          if (which direnv | is-empty) {
-            return
-          }
-          try {
-            direnv export json | from json | default {} | load-env
-            if "PATH" in $env {
-              $env.PATH = ($env.PATH | split row (char esep))
+        pre_prompt: [
+          {|| _tmux_command_spinner_stop }
+          {||
+            if (which direnv | is-empty) {
+              return
             }
-          } catch {}
-        }]
-        pre_execution: [{ null }]
+            try {
+              direnv export json | from json | default {} | load-env
+              if "PATH" in $env {
+                $env.PATH = ($env.PATH | split row (char esep))
+              }
+            } catch {}
+          }
+        ]
+        pre_execution: [{|| _tmux_command_spinner_start }]
         env_change: {
           PWD: []
         }
