@@ -210,6 +210,12 @@ def build_tmux_theme(theme: dict, tokens: dict) -> str:
         left=left,
         right=right,
     )
+    spinner_fg = resolve(tmux["command_spinner_fg"], tokens)
+    spinner = (
+        f"#{{?#{{@pane_command_spinner}},"
+        f"{gap}#[bg=default]#[fg={spinner_fg}]#{{@pane_command_spinner}}#[fg={text_fg}]#[bg=default]{tmux['status_right_padding']},"
+        f"{tmux['status_right_padding']}}}"
+    )
     window = tmux_window_pill(
         number_bg=resolve(tmux["window_icon_bg"], tokens),
         number_fg=icon_fg,
@@ -239,7 +245,7 @@ set -g status-format[1] ""
 set -g status-left-length 100
 set -g status-right-length 100
 set -g status-left "{tmux["status_left_padding"]}{session}{gap}"
-set -g status-right "{directory}{gap}{time}{tmux["status_right_padding"]}"
+set -g status-right "{directory}{gap}{time}{spinner}"
 setw -g window-status-separator "{gap}"
 setw -g window-status-format "{window}"
 setw -g window-status-current-format "{current_window}"

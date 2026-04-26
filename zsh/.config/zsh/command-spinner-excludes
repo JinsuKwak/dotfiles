@@ -1,0 +1,25 @@
+# One zsh pattern per line.
+# Lines match either the first command word or the full command line.
+# Keep long-running servers, full-screen TUIs, shells, and session commands here.
+
+nvim
+vim
+vi
+yazi
+lazygit
+less
+more
+man
+ssh
+tmux
+top
+htop
+btop
+watch
+tail -f*
+tail -F*
+npm run dev*
+pnpm dev*
+yarn dev*
+bun dev*
+python -m http.server*

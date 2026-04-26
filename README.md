@@ -8,6 +8,7 @@ Personal macOS dotfiles built around Ghostty, tmux, Starship, mise, and LazyVim.
 - `tmux` with a top status bar, pill-style theme, TPM plugins, SessionX, Floax, tmux-fzf, URL picker, resurrect, and continuum restore disabled by default.
 - `zsh` by default, with optional `nushell` profile support.
 - `Starship` prompt with directory/git on the left, mise runtime tools and command status on the first-line right side, and contextual right prompt modules on the input line.
+- `tmux` running-command spinner in the status bar for zsh commands that last longer than 500ms.
 - `mise` as the single runtime manager for Python, Node, Java, and other project-local tool versions.
 - `LazyVim` replacing SpaceVim, with transparent theme support and tmux navigator integration.
 - Optional `television` (`tv`) fuzzy picker UI with file, git, Docker, Kubernetes, GitHub, history, tmux, and utility channels.
@@ -83,6 +84,7 @@ The default profile is `zsh`.
 - `~/.zshenv`: XDG paths and `ZDOTDIR`.
 - `~/.config/zsh/.zprofile`: Homebrew path, editor, pager, local bin.
 - `~/.config/zsh/.zshrc`: completion, fzf, zsh plugins, aliases, mise, zoxide, atuin, direnv, optional tv, and Starship.
+- `~/.config/zsh/command-spinner-excludes`: editable zsh patterns for commands that should not show the tmux running-command spinner.
 
 `nushell` layout:
 
