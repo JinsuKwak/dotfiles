@@ -1,5 +1,6 @@
-# One zsh pattern per line.
-# Lines match either the first command word or the full command line.
+# One pattern per line.
+# Exact entries match either the first command word or the full command line.
+# Entries ending in * are treated as command-line prefixes.
 # Keep long-running servers, full-screen TUIs, shells, and session commands here.
 
 nvim
@@ -7,6 +8,9 @@ vim
 vi
 yazi
 lazygit
+k9s
+fzf
+tv
 less
 more
 man

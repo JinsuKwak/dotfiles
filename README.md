@@ -68,7 +68,7 @@ Non-interactive examples:
 - `zsh/`: `~/.zshenv`, `~/.config/zsh/.zprofile`, and `~/.config/zsh/.zshrc`.
 - `nushell/`: `~/.config/nushell/env.nu` and `~/.config/nushell/config.nu`.
 - `starship/`: prompt config and the custom mise runtime module.
-- `tmux/`: tmux config, generated theme, reset config, and small helper scripts.
+- `tmux/`: tmux config, generated theme, shared command spinner config/exclude list, reset config, and small helper scripts.
 - `nvim/`: LazyVim-based Neovim config.
 - `television/`: optional Television config and channel library.
 - `television-nu/`: extra Television channel for Nushell history.
@@ -83,16 +83,57 @@ The default profile is `zsh`.
 
 - `~/.zshenv`: XDG paths and `ZDOTDIR`.
 - `~/.config/zsh/.zprofile`: Homebrew path, editor, pager, local bin.
-- `~/.config/zsh/.zshrc`: completion, fzf, zsh plugins, aliases, mise, zoxide, atuin, direnv, optional tv, and Starship.
-- `~/.config/zsh/command-spinner-excludes`: editable zsh patterns for commands that should not show the tmux running-command spinner.
+- `~/.config/zsh/.zshrc`: completion, fzf, zsh plugins, aliases, mise, zoxide, atuin, direnv, optional tv, Starship, and tmux command spinner hooks.
 
 `nushell` layout:
 
 - `~/.config/nushell/env.nu`: XDG paths, Homebrew path, editor, generated init caches.
 - `~/.config/nushell/config.nu`: aliases, direnv hook, zoxide, atuin, Starship, mise, tmux command spinner hooks, and optional tv keybindings.
-- `~/.config/nushell/command-spinner-excludes`: editable patterns for commands that should not show the tmux running-command spinner.
 
 Ghostty uses `shell-integration = detect` so the terminal is not hard-coded to zsh when the Nushell profile is selected.
+
+## Command Spinner
+
+The tmux command spinner is shared by zsh and Nushell.
+
+Edit excluded commands here:
+
+```bash
+nvim ~/.config/tmux/command-spinner-excludes
+```
+
+Edit the tracked source here:
+
+```bash
+nvim ~/dotfiles/tmux/.config/tmux/command-spinner-excludes
+```
+
+Disable or enable the spinner here:
+
+```bash
+nvim ~/.config/tmux/command-spinner.conf
+# enabled=0 disables it
+# enabled=1 enables it
+```
+
+Temporary override:
+
+```bash
+export TMUX_COMMAND_SPINNER=0
+```
+
+Nushell temporary override:
+
+```nu
+$env.TMUX_COMMAND_SPINNER = "0"
+```
+
+Changes to `command-spinner.conf` and `command-spinner-excludes` apply to newly started commands. If the tmux status UI or generated theme changes, run:
+
+```bash
+python3 ~/dotfiles/scripts/apply_theme.py
+tmux source-file ~/.config/tmux/tmux.conf
+```
 
 ## Theme System
 

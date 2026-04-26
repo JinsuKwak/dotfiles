@@ -116,7 +116,7 @@ Configured aliases:
 
 Runtime tools are rendered by `starship/.config/starship/scripts/mise-tools.sh`. It reads `mise ls --current`, skips `(missing)` tools, and displays known language/tool icons.
 
-When running inside tmux with zsh or Nushell, the active pane shows a green dots spinner after the tmux clock pill when its command runs longer than 500ms. Spinner state is pane-local, so concurrent commands in other panes do not overwrite the active pane display. Pane focus changes also refresh the active pane and clear stale spinner state once that pane is back at a shell prompt. Exclusions are editable in `~/.config/zsh/command-spinner-excludes` or `~/.config/nushell/command-spinner-excludes`.
+When running inside tmux with zsh or Nushell, the active pane shows a green dots spinner after the tmux clock pill when its command runs longer than 500ms. Spinner state is pane-local, so concurrent commands in other panes do not overwrite the active pane display. Pane focus changes also refresh the active pane and clear stale spinner state once that pane is back at a shell prompt. Exclusions are shared by both shells and editable in `~/.config/tmux/command-spinner-excludes`.
 
 ## tmux Core
 

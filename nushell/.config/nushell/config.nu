@@ -1,3 +1,37 @@
+def _tmux_command_spinner_config_value [key: string] {
+  let config_home = ($env.XDG_CONFIG_HOME? | default ($env.HOME | path join ".config"))
+  let config_file = ($config_home | path join "tmux" "command-spinner.conf")
+  let prefix = $"($key)="
+
+  if not ($config_file | path exists) {
+    return null
+  }
+
+  let matches = (
+    open --raw $config_file
+    | lines
+    | each {|line| (($line | split row "#" | first) | str trim) }
+    | where {|line| ($line | str starts-with $prefix) }
+  )
+
+  if ($matches | is-empty) {
+    null
+  } else {
+    $matches | first | str replace $prefix "" | str trim
+  }
+}
+
+def _tmux_command_spinner_enabled [] {
+  let value = if "TMUX_COMMAND_SPINNER" in $env {
+    $env.TMUX_COMMAND_SPINNER
+  } else {
+    _tmux_command_spinner_config_value "enabled" | default "1"
+  }
+
+  let value = ($value | into string | str downcase)
+  not ($value in ["0" "false" "off" "no"])
+}
+
 def _tmux_command_spinner_skip [raw_line: string] {
   let command_line = ($raw_line | str trim)
 
@@ -12,7 +46,7 @@ def _tmux_command_spinner_skip [raw_line: string] {
   }
 
   let config_home = ($env.XDG_CONFIG_HOME? | default ($env.HOME | path join ".config"))
-  let excludes_file = ($config_home | path join "nushell" "command-spinner-excludes")
+  let excludes_file = ($config_home | path join "tmux" "command-spinner-excludes")
 
   if not ($excludes_file | path exists) {
     return false
@@ -60,6 +94,10 @@ def _tmux_command_spinner_start [] {
   }
 
   _tmux_command_spinner_stop
+
+  if not (_tmux_command_spinner_enabled) {
+    return
+  }
 
   let command_line = (commandline | str trim)
 

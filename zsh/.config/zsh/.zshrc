@@ -102,12 +102,55 @@ _tmux_command_spinner_trim() {
   print -r -- "$value"
 }
 
+_tmux_command_spinner_config_value() {
+  emulate -L zsh
+  local key="$1"
+  local config_file="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/command-spinner.conf"
+  local line value
+
+  [[ -r "$config_file" ]] || return 1
+
+  while IFS= read -r line; do
+    line="${line%%\#*}"
+    line="$(_tmux_command_spinner_trim "$line")"
+    [[ -z "$line" ]] && continue
+
+    if [[ "$line" == "$key="* ]]; then
+      value="${line#${key}=}"
+      _tmux_command_spinner_trim "$value"
+      return 0
+    fi
+  done < "$config_file"
+
+  return 1
+}
+
+_tmux_command_spinner_enabled() {
+  emulate -L zsh
+  local value="${TMUX_COMMAND_SPINNER:-}"
+
+  if [[ -z "$value" ]]; then
+    value="$(_tmux_command_spinner_config_value enabled 2>/dev/null || print -r -- 1)"
+  fi
+
+  value="$(_tmux_command_spinner_trim "$value")"
+
+  case "${value:l}" in
+    0|false|off|no)
+      return 1
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+}
+
 _tmux_command_spinner_skip() {
   emulate -L zsh
   local command_line first_word pattern excludes_file
   command_line="$(_tmux_command_spinner_trim "$1")"
   first_word="${command_line%%[[:space:]]*}"
-  excludes_file="${XDG_CONFIG_HOME:-$HOME/.config}/zsh/command-spinner-excludes"
+  excludes_file="${XDG_CONFIG_HOME:-$HOME/.config}/tmux/command-spinner-excludes"
 
   [[ -z "$command_line" ]] && return 0
   [[ "$command_line" == fg(|[[:space:]]*) ]] && return 0
@@ -124,7 +167,13 @@ _tmux_command_spinner_skip() {
     pattern="${pattern%%\#*}"
     pattern="$(_tmux_command_spinner_trim "$pattern")"
     [[ -z "$pattern" ]] && continue
-    [[ "$first_word" == ${~pattern} || "$command_line" == ${~pattern} ]] && return 0
+
+    if [[ "$pattern" == *\* ]]; then
+      local prefix="${pattern%\*}"
+      [[ "$first_word" == "$prefix"* || "$command_line" == "$prefix"* ]] && return 0
+    elif [[ "$first_word" == "$pattern" || "$command_line" == "$pattern" ]]; then
+      return 0
+    fi
   done < "$excludes_file"
 
   return 1
@@ -149,6 +198,7 @@ _tmux_command_spinner_start() {
   command -v tmux >/dev/null 2>&1 || return
 
   _tmux_command_spinner_stop
+  _tmux_command_spinner_enabled || return
   _tmux_command_spinner_skip "$1" && return
 
   (
